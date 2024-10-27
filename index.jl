@@ -12,7 +12,7 @@ begin
 	using JET: @report_opt, @test_opt
 	using LinearAlgebra: dot, mul!
 	using PlutoTeachingTools: TwoColumn, ThreeColumn
-	using PlutoUI: TableOfContents, with_terminal
+	using PlutoUI: Resource, TableOfContents, with_terminal
 	using ProfileCanvas: @profview, @profview_allocs
 	using ProgressLogging: @progress
 	using Test: @testset, @test, @test_broken, @inferred
@@ -37,15 +37,16 @@ md"""
 
 # ╔═╡ 2b831cb3-5edc-48b8-af26-6d459eb0df91
 TwoColumn(
+Resource("https://i.imgur.com/vQZVEJI.png"),
 md"""
-!!! info "Link to this notebook"
+!!! info "Notebook link"
 	<https://gdalle.github.io/JuliaOptimizationDays2024-FastJulia/>
-""",
-md"""
 To run it yourself (on Julia 1.10):
 ```julia$
-using Pkg; Pkg.add("Pluto")
-using Pluto; Pluto.run()
+using Pkg
+Pkg.add("Pluto")
+using Pluto
+Pluto.run()
 ```
 """
 )
@@ -57,9 +58,9 @@ md"""
 
 # ╔═╡ a912431e-5b43-460c-8808-ff80b0c95a29
 md"""
-Check out our blog on best practices for development:
-
-> <https://modernjuliaworkflows.org/>
+Not the topic today but goes hand in hand with performance.
+!!! tip "Blog on best practices"
+	<https://modernjuliaworkflows.org/>
 """
 
 # ╔═╡ e6469d22-66c5-4029-ae4d-7c13999e1d0b
@@ -89,6 +90,12 @@ Let's say you want to use gradient descent to find the optimal $x$.
 # ╔═╡ b825390a-d412-4b05-9fcd-90113b7a115c
 md"""
 ## First implementation
+"""
+
+# ╔═╡ e3d853b8-819d-4996-81c1-e77762c23522
+md"""
+!!! warning
+	For this tutorial we write everything by hand: no linear algebra shortcuts (yet).
 """
 
 # ╔═╡ 3cbb6036-3f2c-4167-a304-6e87460ec182
@@ -411,13 +418,13 @@ Judging by the scary colors in the flame graph, these are the two principles you
 
 # ╔═╡ 37015e7c-d90c-42b8-b93f-44b8bd8e0b55
 md"""
-!!! info "Enable type inference"
+!!! danger "Enable type inference"
 	The type of all variables must be _inferrable_ from the _type_ of function inputs (and not their _value_).
 """
 
 # ╔═╡ 2d92f6be-c4b0-4cd3-b5ac-c3e2d09d99c8
 md"""
-!!! info "Reduce memory allocations"
+!!! danger "Reduce memory allocations"
 	Memory must be _pre-allocated_ and _reused_ whenever possible.
 """
 
@@ -470,18 +477,6 @@ md"""
 - [Fuse vectorized operations](https://docs.julialang.org/en/v1/manual/performance-tips/#More-dots:-Fuse-vectorized-operations) with dots: `x .+= y` instead of `x += y`
 """
 
-# ╔═╡ 607898eb-0c37-4793-b16e-38ad5690430a
-md"""
-## What you shouldn't try at first
-"""
-
-# ╔═╡ 97e6fa54-ba76-4f5b-ab5c-3575e91e17d5
-md"""
-- Over-specialize types (e.g. force `Float64` everywhere)
-- Use [magic macros](https://docs.julialang.org/en/v1/manual/performance-tips/#man-performance-annotations) like `@inbounds`
-- Use parallelism when your sequential code is still unoptimized
-"""
-
 # ╔═╡ 1e469b8c-2f43-4435-a2d3-f17e4923cb35
 md"""
 ## Additional tricks
@@ -489,8 +484,21 @@ md"""
 
 # ╔═╡ b876c1d1-1488-4e92-ab18-681a3c9be02b
 md"""
-- [Parallel computing](https://docs.julialang.org/en/v1/manual/parallel-computing/): multithreading, multiprocessing, GPUs
+- `LinearAlgebra` setup with [BLAS threads](https://docs.julialang.org/en/v1/manual/performance-tips/#man-multithreading-linear-algebra) and [alternative backends](https://docs.julialang.org/en/v1/manual/performance-tips/#man-multithreading-linear-algebra)
 - [StaticArrays.jl](https://github.com/JuliaArrays/StaticArrays.jl) for small vectors and matrices
+- [Parallel computing](https://docs.julialang.org/en/v1/manual/parallel-computing/): multithreading, multiprocessing, GPUs
+"""
+
+# ╔═╡ 607898eb-0c37-4793-b16e-38ad5690430a
+md"""
+## What you shouldn't try first
+"""
+
+# ╔═╡ 97e6fa54-ba76-4f5b-ab5c-3575e91e17d5
+md"""
+- Over-specialize types (e.g. force `Float64` everywhere)
+- Use [annotation macros](https://docs.julialang.org/en/v1/manual/performance-tips/#man-performance-annotations) like `@inbounds` (possibly even dangerous)
+- Exploit parallelism while your sequential code is still unoptimized
 """
 
 # ╔═╡ 35a9ba46-2b77-471a-8bea-50a23a83b2b2
@@ -1442,6 +1450,7 @@ version = "17.4.0+2"
 # ╟─f3f232ed-de69-445c-bd99-9640423247dd
 # ╟─d460ae66-599e-4918-9b5f-ac757bb70308
 # ╟─b825390a-d412-4b05-9fcd-90113b7a115c
+# ╟─e3d853b8-819d-4996-81c1-e77762c23522
 # ╠═3cbb6036-3f2c-4167-a304-6e87460ec182
 # ╠═a4d57bc8-a6c6-4d83-9ed2-509b1a55fb4f
 # ╠═c9c46791-c617-494a-addb-ba600b726a31
@@ -1499,10 +1508,10 @@ version = "17.4.0+2"
 # ╟─d49bbfc5-9779-44ee-ac8d-8b45ecb8a1d3
 # ╟─37001dfc-f16a-4032-9b23-24b98d00fb4a
 # ╟─2e984c6f-e3cc-4bbe-bc65-8610363e5074
-# ╟─607898eb-0c37-4793-b16e-38ad5690430a
-# ╟─97e6fa54-ba76-4f5b-ab5c-3575e91e17d5
 # ╟─1e469b8c-2f43-4435-a2d3-f17e4923cb35
 # ╟─b876c1d1-1488-4e92-ab18-681a3c9be02b
+# ╟─607898eb-0c37-4793-b16e-38ad5690430a
+# ╟─97e6fa54-ba76-4f5b-ab5c-3575e91e17d5
 # ╟─35a9ba46-2b77-471a-8bea-50a23a83b2b2
 # ╟─74a7e718-baab-49eb-a80c-87f2b69881f8
 # ╟─840bbf2a-6f26-441d-970f-d841bee4bafb
